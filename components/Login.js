@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, StyleSheet, TextInput, Button } from "react-native";
 
 
 class Login extends React.Component {
@@ -9,7 +9,8 @@ class Login extends React.Component {
     }
     render (){
         return (
-            <View>
+            <View style={styles.container}>
+                <Text></Text>
                 <TextInput placeholder ="Email"></TextInput>
                 <TextInput placeholder ="Password"></TextInput>
                 <Button  title="Login"/>
@@ -17,4 +18,13 @@ class Login extends React.Component {
           );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });
 export default Login;
