@@ -7,7 +7,8 @@ export default function App() {
   return (
     <View style={styles.signup}>
       <StatusBar style="auto" />
-      <SignUp />
+      {/* <SignUp /> */}
+      <Login />
       
     </View>
   );
