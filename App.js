@@ -1,14 +1,18 @@
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
+import Map from './components/map'
+
 import React from "react";
 import { StyleSheet, View, StatusBar } from "react-native";
+
 
 export default function App() {
   return (
     <View style={styles.signup}>
       <StatusBar style="auto" />
       {/* <SignUp /> */}
-      <Login />
+      {/* <Login /> */}
+      <Map/>
     </View>
   );
 }
