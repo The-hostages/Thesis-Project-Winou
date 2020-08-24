@@ -1,7 +1,7 @@
-import Login from './components/Login'
-import SignUp from './components/SignUp'
-import React from 'react';
-import { StyleSheet, View, StatusBar } from 'react-native';
+import Login from "./components/Login";
+import SignUp from "./components/SignUp";
+import React from "react";
+import { StyleSheet, View, StatusBar } from "react-native";
 
 export default function App() {
   return (
@@ -9,17 +9,15 @@ export default function App() {
       <StatusBar style="auto" />
       {/* <SignUp /> */}
       <Login />
-      
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   signup: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
