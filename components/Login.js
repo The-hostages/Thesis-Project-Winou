@@ -26,7 +26,7 @@ class Login extends React.Component {
   }
   render() {
     return (
-      <View style={styles.container}>
+      <View style={{}}>
         <Text style={styles.error}>{this.state.error}</Text>
         <TextInput
           placeholder="Your Email"
