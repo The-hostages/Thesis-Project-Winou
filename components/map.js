@@ -8,6 +8,8 @@ import * as Permissions from 'expo-permissions';
 import Polyline from '@mapbox/polyline';
 
 const locations = require('../locations.json')
+const trainligne = require("../../encodedPoly.json");
+
 
 
 const { width, height } = Dimensions.get("window");
@@ -34,7 +36,7 @@ export default class Map extends React.Component {
       loading: true, 
       loadingMap:false,
       locations:locations,
-      onetoTwo :"ed~_Fkuf}@`GApGdBlEpCpFtA`UPjHvAlFvB|CjD~CxGxBtH|BdMbDfRlAfH`AbD|DlAtOnCvKZzKfAxFdArD?zBaDpA_DdJ{S`MkXnDmC`\z_@bAz@`TlTpIjGzNoPpLuArEnBjZvKrIjBlDz@fUuA~\oCLvBlBG"
+      trainligne:trainligne
     };
   
     async getLocationAsync() {
@@ -74,10 +76,10 @@ export default class Map extends React.Component {
       try {
         console.log('executing')
         
-        const resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE`)
+        const resp = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE&mode=walking`)
         const respJson = await resp.json();
         const response =  await respJson.routes[0]
-        const distanceTime =  response.legs[0]
+        // const distanceTime =  response.legs[0]
         // const distance =  distanceTime.distance.text
         // const time = distanceTime.duration.text
         
@@ -94,17 +96,17 @@ export default class Map extends React.Component {
       }
     }
 
-  async trainItenerary (){
-      const { onetoTwo}=this.state;
-      const points = await Polyline.decode(onetoTwo)
-      console.log("trainItenerary",points)
-      const coordsTrain = points.map(point => {
-        return {
+    async trainItenerary() {
+      const { trainligne } = this.state;
+      const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
+      // const points = await Polyline.decode(trainligne.ligneOne[1]);
+      const coordsTrain = add.map((added) =>
+        added.map((point) => ({
           latitude: point[0],
-          longitude: point[1]
-        }
-      })
-      this.setState({ coordsTrain })
+          longitude: point[1],
+        }))
+      ).flat()
+      this.setState({ coordsTrain });
     }
 
     mergeCoords = async () => {
