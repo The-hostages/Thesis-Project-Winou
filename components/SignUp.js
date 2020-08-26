@@ -36,7 +36,7 @@ class SignUp extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text id="error" style={styles.error}>
           {this.state.error}
         </Text>
