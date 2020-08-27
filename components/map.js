@@ -1,7 +1,7 @@
 import React from "react";
 import MapView, { Marker } from "react-native-maps";
 import { StyleSheet, View, Dimensions } from "react-native";
-
+import axios from "axios";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 
@@ -77,14 +77,15 @@ export default class Map extends React.Component {
 
   async getDirections(startLoc, desLoc) {
     try {
-      console.log("executing");
+      console.log("execqsdsqdqsduting");
 
-      const resp = await fetch(
+      const resp = await axios.get(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE`
       );
-      const respJson = await resp.json();
-      const response = await respJson.routes[0];
-      const distanceTime = response.legs[0];
+      const respJson = resp.data;
+      console.log("distanceTime", Object.keys(respJson));
+      const response = respJson.routes[0];
+      // const distanceTime = response.legs[0];
       // const distance =  distanceTime.distance.text
       // const time = distanceTime.duration.text
 
@@ -182,6 +183,7 @@ export default class Map extends React.Component {
             style={Styles.map}
             initialRegion={positionState}
             showsUserLocation
+            rotateEnabled={false}
           >
             {this.renderMarkers()}
             <MapView.Polyline
@@ -233,11 +235,11 @@ const Styles = StyleSheet.create({
   map: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    //   left: 0,
-    //   right: 0,
-    //   top: 0,
-    //   bottom: 0,
-    //   position: "absolute"
+    // left: 0,
+    // right: 0,
+    // top: 0,
+    // bottom: 0,
+    // position: "absolute",
   },
   loading: {
     position: "absolute",
