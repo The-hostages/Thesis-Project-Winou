@@ -4,7 +4,7 @@ function AppButton({ title, navigation }) {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate(title);
+        navigation.navigate(title, { navigation });
       }}
     >
       <View style={styles.button}>
