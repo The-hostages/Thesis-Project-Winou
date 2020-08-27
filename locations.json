@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Place de Barcelona",
+    "adress": "33, Avenue de la Gare, Place Barcelone, Tunis 1001",
+    "coords": {
+      "latitude": 36.796065,
+      "longitude": 10.180462
+    }
+  },
+  {
+    "name": "Place de la Republique",
+    "adress": "Tunis 1001",
+    "coords": {
+      "latitude": 36.806497,
+      "longitude": 10.180767
+    }
+  },
+  {
+    "name": "Mohamed V",
+    "adress": "Rue Chabane El Bhouri, Tunis",
+    "coords": {
+      "latitude": 36.815853,
+      "longitude": 10.183471
+    }
+  }
+]
