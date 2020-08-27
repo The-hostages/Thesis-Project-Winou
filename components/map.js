@@ -99,15 +99,14 @@ export default class Map extends React.Component {
   _getNearestStation = async (lat, long) => {
     try {
       const current = { lat, long };
-      const stationsting = locations
-        .map((loction) =>
-          [loction.coords.latitude, loction.coords.longitude].join("%2C")
+      const stationstring = locations
+        .map((location) =>
+          [location.coords.latitude, location.coords.longitude].join("%2C")
         )
         .join("%7C");
       const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&mode=walking&origins=${current.lat},${current.long}&destinations=${locations}&key=${API_KEY}`
+        `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&mode=walking&origins=${current.lat},${current.long}&destinations=${stationstring}&key=${API_KEY}`
       );
-
       const res = response.data.rows[0].elements
         .map((ele, i) => {
           return {
@@ -116,7 +115,9 @@ export default class Map extends React.Component {
             coords: locations[i].coords,
           };
         })
+
         .sort((a, b) => a.duration.value - b.duration.value)[0];
+
       this.setState({
         latitudeStation: res.coords.latitude,
         longitudeStation: res.coords.longitude,
@@ -173,25 +174,25 @@ export default class Map extends React.Component {
       this.mergeCoords
     );
   };
-  renderMarkers = () => {
-    const { locations } = this.state;
-    return (
-      <View>
-        {locations.map((location, idx) => {
-          const {
-            coords: { latitude, longitude },
-          } = location;
-          return (
-            <Marker
-              key={idx}
-              coordinate={{ latitude, longitude }}
-              onPress={this.onMarkerPress(location)}
-            />
-          );
-        })}
-      </View>
-    );
-  };
+  // renderMarkers = () => {
+  //   const { locations } = this.state;
+  //   return (
+  //     <View>
+  //       {locations.map((location, idx) => {
+  //         const {
+  //           coords: { latitude, longitude },
+  //         } = location;
+  //         return (
+  //           <Marker
+  //             key={idx}
+  //             coordinate={{ latitude, longitude }}
+  //             onPress={this.onMarkerPress(location)}
+  //           />
+  //         );
+  //       })}
+  //     </View>
+  //   );
+  // };
   render() {
     let {
       positionState,
@@ -210,7 +211,7 @@ export default class Map extends React.Component {
             showsUserLocation
             rotateEnabled={false}
           >
-            {this.renderMarkers()}
+            {/* {this.renderMarkers()} */}
             <MapView.Polyline
               strokeWidth={4}
               strokeColor="rgba(255,140,0,0.8)"
