@@ -4,8 +4,8 @@ import { StyleSheet, View, Dimensions } from "react-native";
 import axios from "axios";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
-
 import Polyline from "@mapbox/polyline";
+
 const trainligne = require("../encodedPoly.json");
 
 const locations = require("../locations.json");
@@ -75,15 +75,11 @@ export default class Map extends React.Component {
 
   async getDirections(startLoc, desLoc) {
     try {
-      console.log("execqsdsqdqsduting");
-
       const resp = await axios.get(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${API_KEY}`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${API_KEY}&mode=walking`
       );
-      const respJson = resp.data;
-      console.log("distanceTime", Object.keys(respJson));
-      const response = respJson.routes[0];
-      // const distanceTime = response.legs[0];
+      const response = await resp.data.routes[0];
+      // const distanceTime =  response.legs[0]
       // const distance =  distanceTime.distance.text
       // const time = distanceTime.duration.text
 
@@ -99,6 +95,7 @@ export default class Map extends React.Component {
       console.log("Error: ", error);
     }
   }
+
   _getNearestStation = async (lat, long) => {
     try {
       const current = { lat, long };
@@ -128,19 +125,6 @@ export default class Map extends React.Component {
       console.log("Error", e);
     }
   };
-  async trainItenerary() {
-    const { trainligne } = this.state;
-    const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
-    const coordsTrain = add
-      .map((added) =>
-        added.map((point) => ({
-          latitude: point[0],
-          longitude: point[1],
-        }))
-      )
-      .flat();
-    this.setState({ coordsTrain });
-  }
 
   mergeCoords = async () => {
     const { positionState, latitudeStation, longitudeStation } = this.state;
@@ -155,6 +139,20 @@ export default class Map extends React.Component {
     }
   };
   //till here
+  async trainItenerary() {
+    const { trainligne } = this.state;
+    const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
+    // const points = await Polyline.decode(trainligne.ligneOne[1]);
+    const coordsTrain = add
+      .map((added) =>
+        added.map((point) => ({
+          latitude: point[0],
+          longitude: point[1],
+        }))
+      )
+      .flat();
+    this.setState({ coordsTrain });
+  }
 
   componentDidUpdate() {
     if (this.state.positionState.latitude !== 0) {

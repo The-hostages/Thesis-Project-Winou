@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, TextInput, Alert } from "react-native";
 import axios from "axios";
-
+import { NativeModules } from "react-native";
 class SignUp extends React.Component {
   constructor(props) {
     super(props);
@@ -17,6 +17,7 @@ class SignUp extends React.Component {
   }
 
   signUp(e) {
+    console.log("here");
     e.preventDefault();
     const user = {
       first_name: this.state.first_name,
@@ -27,10 +28,10 @@ class SignUp extends React.Component {
     axios
       .post(this.path, user)
       .then(() => {
-        console.log("success");
+        NativeModules.DevSettings.reload();
       })
       .catch((err) => {
-        this.setState({ error: err.response.data });
+        this.setState({ error: err });
       });
   }
 
@@ -69,7 +70,7 @@ class SignUp extends React.Component {
           }}
         ></TextInput>
         <Text style={styles.button} onPress={this.signUp}>
-          Sign up
+          Register
         </Text>
       </View>
     );

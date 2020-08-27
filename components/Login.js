@@ -15,12 +15,14 @@ class Login extends React.Component {
   }
 
   login(e) {
-    e.preventDefault();
     axios
-      .post(this.path, { email: this.state.email })
-      .then(() => console.log("success"))
+      .post(this.path, {
+        email: this.state.email,
+        password: this.state.password,
+      })
+      .then(() => this.props.route.params.navigation.navigate("Map"))
       .catch((err) => {
-        console.log(err.response.data);
+        console.log("error", this.state.password);
         this.setState({ error: err.response.data });
       });
   }
@@ -42,16 +44,21 @@ class Login extends React.Component {
             this.setState({ password });
           }}
         ></TextInput>
+
         <Text style={styles.button} onPress={this.login}>
           Login
         </Text>
-        <Text style={styles.buttonSignUp}>Sign Up</Text>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   input: {
     borderRadius: 20,
     borderWidth: 2,
