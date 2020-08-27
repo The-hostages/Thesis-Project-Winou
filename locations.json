@@ -1,21 +1,26 @@
 [
-    {
-        "name": "Independence Palace",
-        "address": "135 Nam Kỳ Khởi Nghĩa, Phường Bến Thành, Quận 1, Hồ Chí Minh 700000",
-        "coords": {
-            "latitude": 36.887155, 
-            "longitude": 10.183314
-            
-        },
-        "image_url": "https://media.glassdoor.com/l/de/cd/ae/b6/the-face-shop.jpg"
-    },
-    {
-        "name": "Turtle Lake",
-        "address": "Turtle Lake, phường 6, District 3, Ho Chi Minh City",
-        "coords": {
-            "latitude": 36.892083, 
-            "longitude": 10.181238
-        },
-        "image_url": "http://dreamercosmetic.com/uploads/source/chekd101/trangdiem/bomyphamchanel5moncaocap11600x450.jpg"
+  {
+    "name": "Place de Barcelona",
+    "adress": "33, Avenue de la Gare, Place Barcelone, Tunis 1001",
+    "coords": {
+      "latitude": 36.796065,
+      "longitude": 10.180462
     }
+  },
+  {
+    "name": "Place de la Republique",
+    "adress": "Tunis 1001",
+    "coords": {
+      "latitude": 36.806497,
+      "longitude": 10.180767
+    }
+  },
+  {
+    "name": "Mohamed V",
+    "adress": "Rue Chabane El Bhouri, Tunis",
+    "coords": {
+      "latitude": 36.815853,
+      "longitude": 10.183471
+    }
+  }
 ]
