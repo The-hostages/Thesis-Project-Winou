@@ -6,11 +6,10 @@ import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Polyline from "@mapbox/polyline";
 
-const locations = require("../locations.json")
+const locations = require("../locations.json");
 const trainligne = require("../encodedPoly.json");
 
 const { width, height } = Dimensions.get("window");
-
 const SCREEN_HEIGHT = height;
 const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
@@ -35,6 +34,7 @@ export default class Map extends React.Component {
     trainligne: trainligne,
     longitudeStation: 0,
     latitudeStation: 0,
+    allCoordsTrain: [],
   };
 
   async getLocationAsync() {
@@ -59,26 +59,18 @@ export default class Map extends React.Component {
       await this._getNearestStation(region.latitude, region.longitude);
       this.setState(
         {
-          positionState: region
+          positionState: region,
         },
         this.mergeCoords
       );
-    } catch (e) {
-      console.log("error", e);
-    }
+    } catch (e) {}
   }
   async componentDidMount() {
-    await this.trainItenerary();
-    await this.getLocationAsync();
-  }
-  async componentDidMount() {
-    await this.trainItenerary();
+    await this.AlltrainItenerary();
     await this.getLocationAsync();
   }
   async getDirections(startLoc, desLoc) {
     try {
-
-    
       const resp = await axios.get(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE&mode=walking`
       );
@@ -95,9 +87,7 @@ export default class Map extends React.Component {
         };
       });
       this.setState({ coords });
-    } catch (error) {
-      console.log("Error: ", error);
-    }
+    } catch (error) {}
   }
   _getNearestStation = async (lat, long) => {
     try {
@@ -125,28 +115,51 @@ export default class Map extends React.Component {
         latitudeStation: res.coords.latitude,
         longitudeStation: res.coords.longitude,
       });
-    } catch (e) {
-      console.log("Error", e);
-    }
+    } catch (e) {}
   };
 
-  async trainItenerary() {
-    const { trainligne } = this.state;
-    const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
-    // const points = await Polyline.decode(trainligne.ligneOne[1]);
-    const coordsTrain = add
-      .map((added) =>
-        added.map((point) => ({
-          latitude: point[0],
-          longitude: point[1],
-        }))
-      )
-      .flat();
-    this.setState({ coordsTrain });
+  async AlltrainItenerary() {
+    try {
+      const { trainligne } = this.state;
+      const add = await Object.values(trainligne).map((ligne) =>
+        ligne.map((ougabouga) => Polyline.decode(ougabouga))
+      );
+      // const points = await Polyline.decode(trainligne.ligneOne[1]);
+      // const allCoordsTrain = add.map((ligne) =>
+      //   ligne.flat().map((point) => ({
+      //     latitude: point[0],
+      //     longitude: point[1],
+      //   }))
+      // );
+      const allCoordsTrain = add
+        .map((poly) => poly.flat())
+        .map((point) =>
+          point.map((pis) => ({
+            latitude: pis[0],
+            longitude: pis[1],
+          }))
+        );
+      // console.log(JSON.stringify(allCoordsTrain));
+      this.setState({ allCoordsTrain });
+      // return (
+      //   <View>
+      //     {allCoordsTrain.map((ligne, idx) => (
+      //       <MapView.Polyline
+      //         key={idx}
+      //         strokeWidth={4}
+      //         strokeColor="rgba(22,140,0,0.7)"
+      //         coordinates={ligne}
+      //       />
+      //     ))}
+      //   </View>
+      // );
+    } catch (e) {
+      console.error("error", e);
+    }
   }
 
   mergeCoords = async () => {
-    const { positionState, latitudeStation , longitudeStation } = this.state;
+    const { positionState, latitudeStation, longitudeStation } = this.state;
 
     const hasStartAndEnd =
       positionState.latitude !== null && latitudeStation !== null;
@@ -160,7 +173,8 @@ export default class Map extends React.Component {
   //till here
 
   componentDidUpdate() {
-    if (this.state.positionState.latitude !== 0) {
+    const { positionState, loadingMap, loading } = this.state;
+    if (positionState.latitude !== 0) {
       this.state.loadingMap = true;
       this.state.loading = false;
     }
@@ -197,6 +211,21 @@ export default class Map extends React.Component {
       </View>
     );
   };
+  // async trainItenerary() {
+  //   const { trainligne } = this.state;
+  //   const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
+  //   // const points = await Polyline.decode(trainligne.ligneOne[1]);
+  //   const coordsTrain = add
+  //     .map((added) =>
+  //       added.map((point) => ({
+  //         latitude: point[0],
+  //         longitude: point[1],
+  //       }))
+  //     )
+  //     .flat();
+  //   // console.log("coooooooo", coordsTrain);
+  //   this.setState({ coordsTrain });
+  // }
   render() {
     let {
       positionState,
@@ -204,7 +233,8 @@ export default class Map extends React.Component {
       loadingMap,
       coordsTrain,
       longitudeStation,
-      latitudeStation
+      latitudeStation,
+      allCoordsTrain,
     } = this.state;
     return (
       <View style={Styles.container}>
@@ -221,13 +251,26 @@ export default class Map extends React.Component {
               strokeColor="rgba(255,140,0,0.8)"
               coordinates={coords}
             />
-            <MapView.Polyline
+            {allCoordsTrain.map((ligne, idx) => (
+              <MapView.Polyline
+                key={idx}
+                strokeWidth={4}
+                strokeColor="rgba(22,140,0,0.7)"
+                coordinates={ligne}
+              />
+            ))}
+
+            {/* <MapView.Polyline
               strokeWidth={4}
               strokeColor="rgba(22,140,0,0.7)"
               coordinates={coordsTrain}
-            />
+            /> */}
+
             <Marker
-              coordinate={{ latitude: latitudeStation, longitude: longitudeStation }}
+              coordinate={{
+                latitude: latitudeStation,
+                longitude: longitudeStation,
+              }}
             />
           </MapView>
         )}
