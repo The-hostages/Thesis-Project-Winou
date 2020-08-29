@@ -7,6 +7,7 @@ class Login extends React.Component {
     super(props);
     this.state = {
       email: "",
+
       password: "",
       error: "",
     };
@@ -22,13 +23,13 @@ class Login extends React.Component {
       })
       .then(() => this.props.route.params.navigation.navigate("Map"))
       .catch((err) => {
-        console.log("error", this.state.password);
-        this.setState({ error: err.response.data });
+        console.log("error");
+        this.setState({ error: err });
       });
   }
   render() {
     return (
-      <View style={{}}>
+      <View style={styles.container}>
         <Text style={styles.error}>{this.state.error}</Text>
         <TextInput
           placeholder="Your Email"
@@ -38,6 +39,7 @@ class Login extends React.Component {
           }}
         ></TextInput>
         <TextInput
+          secureTextEntry={true}
           placeholder="Your Password"
           style={styles.input}
           onChangeText={(password) => {

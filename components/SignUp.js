@@ -63,6 +63,7 @@ class SignUp extends React.Component {
           }}
         ></TextInput>
         <TextInput
+          secureTextEntry={true}
           placeholder="password"
           style={styles.input}
           onChangeText={(password) => {
