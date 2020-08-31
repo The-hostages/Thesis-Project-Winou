@@ -22,5 +22,125 @@
       "latitude": 36.815853,
       "longitude": 10.183471
     }
+  },
+  {
+    "name": "Ariana terminal",
+    "adress": "Rue De Beyrouth، Ariana",
+    "coords": {
+      "latitude": 36.859708,
+      "longitude": 10.197498
+    }
+  },
+  {
+    "name": "L'indpendance",
+    "adress": "Ariana",
+    "coords": {
+      "latitude": 36.854508,
+      "longitude": 10.195847
+    }
+  },
+  {
+    "name": "10 Décembre",
+    "adress": "Avenue Hedi Karray, Tunis",
+    "coords": {
+      "latitude": 36.844371,
+      "longitude": 10.184223
+    }
+  },
+  {
+    "name": "Cité Sportive",
+    "adress": "Tunis",
+    "coords": {
+      "latitude": 36.838559,
+      "longitude": 10.18198
+    }
+  },
+  {
+    "name": "La jeunesse",
+    "adress": "Avenue Tahar Ben Anchour, Tunis",
+    "coords": {
+      "latitude": 36.833321,
+      "longitude": 10.182881
+    }
+  },
+  {
+    "name": "Cité el Khadra",
+    "adress": "Cité El Khadra, Tunis",
+    "coords": {
+      "latitude": 36.829246,
+      "longitude": 10.19037
+    }
+  },
+  {
+    "name": "Lafayet",
+    "adress": "Cite Jardins, Tunis",
+    "coords": {
+      "latitude": 36.823315,
+      "longitude": 10.18547
+    }
+  },
+  {
+    "name": "Palestine",
+    "adress": "Avenue Louis Braille, Tunis",
+    "coords": {
+      "latitude": 36.820034,
+      "longitude": 10.181994
+    }
+  },
+  {
+    "name": "Mohamed V",
+    "adress": "Rue Chabane El Bhouri, Tunis",
+    "coords": {
+      "latitude": 36.815802,
+      "longitude": 10.18347
+    }
+  },
+  {
+    "name": "Nelson Mandella",
+    "adress": "La Fayette, Tunis",
+    "coords": {
+      "latitude": 36.812581,
+      "longitude": 10.183373
+    }
+  },
+  {
+    "name": "Place de la republic",
+    "adress": "Tunis 1001",
+    "coords": {
+      "latitude": 36.806494,
+      "longitude": 10.180781
+    }
+  },
+  {
+    "name": "Ibn Rachid",
+    "adress": "22 Avenue de Paris, Tunis",
+    "coords": {
+      "latitude": 36.802044,
+      "longitude": 10.180942
+    }
+  },
+  {
+    "name": "Barcelona",
+    "adress": "33, Avenue de la Gare, Place Barcelone, Tunis 1001",
+    "coords": {
+      "latitude": 36.796038,
+      "longitude": 10.180677
+    }
+  },
+  {
+    "name": "Farhat Hached",
+    "adress": "34-26 Ave Farhat Hached, Tunis",
+    "coords": {
+      "latitude": 36.79791,
+      "longitude": 10.186117
+    }
+  },
+  {
+    "name": "Tunis Marine",
+    "adress": "Rue de Madagascar, Tunis",
+    "coords": {
+      "latitude": 36.800169,
+      "longitude": 10.192855
+    }
   }
 ]
