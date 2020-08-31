@@ -6,7 +6,6 @@ import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Polyline from "@mapbox/polyline";
 import { NavigationContainer } from "@react-navigation/native";
-import MyTabs from "./NavComponent";
 
 const trainligne = require("../encodedPoly.json");
 
