@@ -35,6 +35,8 @@ export default class Map extends React.Component {
     longitudeStation: 0,
     latitudeStation: 0,
     allCoordsTrain: [],
+    oneLigne: 2,
+    oneCoords: [],
   };
 
   async getLocationAsync() {
@@ -139,20 +141,7 @@ export default class Map extends React.Component {
             longitude: pis[1],
           }))
         );
-      // console.log(JSON.stringify(allCoordsTrain));
       this.setState({ allCoordsTrain });
-      // return (
-      //   <View>
-      //     {allCoordsTrain.map((ligne, idx) => (
-      //       <MapView.Polyline
-      //         key={idx}
-      //         strokeWidth={4}
-      //         strokeColor="rgba(22,140,0,0.7)"
-      //         coordinates={ligne}
-      //       />
-      //     ))}
-      //   </View>
-      // );
     } catch (e) {
       console.error("error", e);
     }
@@ -173,12 +162,16 @@ export default class Map extends React.Component {
   //till here
 
   componentDidUpdate() {
-    const { positionState } = this.state;
+    const { positionState, oneLigne, allCoordsTrain } = this.state;
     if (positionState.latitude !== 0) {
       this.state.loadingMap = true;
       this.state.loading = false;
     }
+    if (oneLigne !== 0) {
+      this.state.oneCoords = [allCoordsTrain[oneLigne]];
+    }
   }
+
   onMarkerPress = (location) => async () => {
     const {
       coords: { latitude, longitude },
@@ -212,21 +205,7 @@ export default class Map extends React.Component {
       </View>
     );
   };
-  // async trainItenerary() {
-  //   const { trainligne } = this.state;
-  //   const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
-  //   // const points = await Polyline.decode(trainligne.ligneOne[1]);
-  //   const coordsTrain = add
-  //     .map((added) =>
-  //       added.map((point) => ({
-  //         latitude: point[0],
-  //         longitude: point[1],
-  //       }))
-  //     )
-  //     .flat();
-  //   // console.log("coooooooo", coordsTrain);
-  //   this.setState({ coordsTrain });
-  // }
+
   render() {
     let {
       positionState,
@@ -236,7 +215,11 @@ export default class Map extends React.Component {
       longitudeStation,
       latitudeStation,
       allCoordsTrain,
+      oneLigne,
+      oneCoords,
     } = this.state;
+    const data = oneLigne ? oneCoords : allCoordsTrain;
+    console.log("allcoordtrainnnnn", allCoordsTrain[1]);
     return (
       <View style={Styles.container}>
         {loadingMap && (
@@ -252,7 +235,7 @@ export default class Map extends React.Component {
               strokeColor="rgba(255,140,0,0.8)"
               coordinates={coords}
             />
-            {allCoordsTrain.map((ligne, idx) => (
+            {data.map((ligne, idx) => (
               <MapView.Polyline
                 key={idx}
                 strokeWidth={4}
