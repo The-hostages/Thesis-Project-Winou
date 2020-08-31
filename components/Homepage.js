@@ -7,6 +7,7 @@ import {
   StatusBar,
 } from "react-native";
 import AppButton from "./AppButton";
+
 function Homepage({ navigation }) {
   return (
     <ImageBackground
@@ -17,9 +18,8 @@ function Homepage({ navigation }) {
         <View style={styles.loginButton}>
           <AppButton title="Login" navigation={navigation} />
         </View>
-
         <View style={styles.registerButton}>
-          <AppButton title="Register" navigation={navigation} />
+          <AppButton title="SignUp" navigation={navigation} />
         </View>
       </View>
     </ImageBackground>

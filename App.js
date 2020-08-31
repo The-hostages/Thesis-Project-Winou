@@ -6,6 +6,11 @@ import Map from "./components/map";
 import Homepage from "./components/Homepage";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
+import { YellowBox } from "react-native";
+
+YellowBox.ignoreWarnings([
+  "Non-serializable values were found in the navigation state",
+]);
 const Stack = createStackNavigator();
 const StackNavigator = () => {
   return (
@@ -16,12 +21,17 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="Map"
+        component={Map}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="Login"
         component={Map}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Register"
+        name="SignUp"
         component={SignUp}
         options={{ headerShown: false }}
       />
