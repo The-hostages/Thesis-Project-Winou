@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import { YellowBox } from "react-native";
 import MyTabs from "./components/NavComponent";
+import Line from "./components/Lines";
 
 YellowBox.ignoreWarnings([
   "Non-serializable values were found in the navigation state",

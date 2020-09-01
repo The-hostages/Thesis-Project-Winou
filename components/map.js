@@ -18,9 +18,10 @@ const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
+var API_KEY = "AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE";
 export default class Map extends React.Component {
   state = {
+    line: -1,
     positionState: {
       latitude: 0,
       longitude: 0,
@@ -41,6 +42,9 @@ export default class Map extends React.Component {
     oneLigne: 0,
     oneCoords: [],
   };
+  changeLine(x) {
+    this.setState = { line: x };
+  }
 
   async getLocationAsync() {
     try {
@@ -161,6 +165,7 @@ export default class Map extends React.Component {
   async AlltrainItenerary() {
     try {
       const { trainligne } = this.state;
+      console.log(trainligne);
       const add = await Object.values(trainligne).map((ligne) =>
         ligne.map((ougabouga) => Polyline.decode(ougabouga))
       );
