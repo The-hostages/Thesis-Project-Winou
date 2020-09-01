@@ -7,7 +7,7 @@ import Homepage from "./components/Homepage";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import { YellowBox } from "react-native";
-
+import Trackee from "./components/locationTracking";
 YellowBox.ignoreWarnings([
   "Non-serializable values were found in the navigation state",
 ]);

@@ -1,11 +1,11 @@
 import React from "react";
-import MapView, { Marker } from "react-native-maps";
-import { StyleSheet, View, Dimensions } from "react-native";
+import MapView, { Marker, AnimatedRegion } from "react-native-maps";
+import { StyleSheet, View, Dimensions, Text } from "react-native";
 import axios from "axios";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Polyline from "@mapbox/polyline";
-
+import haversine from "haversine";
 const trainligne = require("../encodedPoly.json");
 
 const locations = require("../locations.json");
@@ -17,18 +17,18 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 var API_KEY = "AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE";
+
 export default class Map extends React.Component {
   state = {
     positionState: {
-      latitude: 0,
-      longitude: 0,
+      latitude: 10,
+      longitude: 37,
       latitudeDelta: 0,
       longitudeDelta: 0,
     },
-    // markerPosition: {
-    //   latitude: 0,
-    //   longitude: 0,
-    // },
+    routeCoordinates: [],
+    distanceTravelled: 0, // contain live distance
+    prevLatLng: {},
     loading: true,
     loadingMap: false,
     locations: locations,
@@ -63,11 +63,41 @@ export default class Map extends React.Component {
         },
         this.mergeCoords
       );
+      await Location.watchPositionAsync(
+        {
+          enableHighAccuracy: true,
+          timeInterval: 1000,
+          distanceInterval: 2,
+        },
+        (position) => {
+          console.log("positionnnnnnnnnnnnnnn", position);
+          const { latitude, longitude } = position.coords;
+          const { routeCoordinates, distanceTravelled } = this.state;
+          const newCoordinate = { latitude, longitude };
+          console.log("ok", newCoordinate);
+          this.setState({
+            latitude,
+            longitude,
+            distanceTravelled:
+              distanceTravelled + this.calcDistance(newCoordinate),
+            routeCoordinates: routeCoordinates.concat([newCoordinate]),
+            prevLatLng: newCoordinate,
+          });
+          console.log("dist", this.state);
+          setTimeout(() => {
+            console.log("time out", this.state);
+          }, 2000);
+        }
+      );
     } catch (e) {
       console.log("Error", e);
     }
   }
-
+  calcDistance = (newLatLng) => {
+    const { prevLatLng } = this.state;
+    console.log("hey", prevLatLng);
+    return haversine(prevLatLng, newLatLng) || 0;
+  };
   async componentDidMount() {
     await this.trainItenerary();
     await this.getLocationAsync();
@@ -79,11 +109,9 @@ export default class Map extends React.Component {
         `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${API_KEY}&mode=walking`
       );
       const response = await resp.data.routes[0];
-      // const distanceTime =  response.legs[0]
-      // const distance =  distanceTime.distance.text
-      // const time = distanceTime.duration.text
 
       const points = Polyline.decode(response.overview_polyline.points);
+
       const coords = points.map((point) => {
         return {
           latitude: point[0],
@@ -143,7 +171,6 @@ export default class Map extends React.Component {
   async trainItenerary() {
     const { trainligne } = this.state;
     const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
-    // const points = await Polyline.decode(trainligne.ligneOne[1]);
     const coordsTrain = add
       .map((added) =>
         added.map((point) => ({
@@ -161,6 +188,7 @@ export default class Map extends React.Component {
       this.state.loading = false;
     }
   }
+
   onMarkerPress = (location) => async () => {
     const {
       coords: { latitude, longitude },
@@ -199,6 +227,8 @@ export default class Map extends React.Component {
       coords,
       loadingMap,
       coordsTrain,
+      routeCoordinates,
+      distanceTravelled,
       longitudeStation,
       latitudeStation,
     } = this.state;
@@ -219,9 +249,14 @@ export default class Map extends React.Component {
             />
             <MapView.Polyline
               strokeWidth={4}
-              strokeColor="rgba(22,140,0,0.7)"
+              strokeColor="rgba(255,140,0,0.8)"
               coordinates={coordsTrain}
             />
+            {/* <MapView.Polyline
+              strokeWidth={4}
+              strokeColor="rgba(266,266,266,0.8)"
+              coordinates={routeCoordinates}
+            /> */}
             <Marker
               coordinate={{
                 latitude: latitudeStation,
@@ -230,6 +265,9 @@ export default class Map extends React.Component {
             />
           </MapView>
         )}
+        <View style={Styles.distanceContainer}>
+          <Text>{parseFloat(distanceTravelled).toFixed(2)} km</Text>
+        </View>
       </View>
     );
   }
@@ -281,5 +319,10 @@ const Styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  distanceContainer: {
+    flexDirection: "row",
+    marginVertical: 20,
+    backgroundColor: "transparent",
   },
 });
