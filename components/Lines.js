@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 class Line extends React.Component {
   constructor(props) {
@@ -11,54 +11,73 @@ class Line extends React.Component {
   render() {
     return (
       <View>
-        <Text
-          style={styles.button}
-          onPress={() => this.navigation.navigate("Map", { line: 1 })}
-        >
-          Metro 1
-        </Text>
-        <Text
-          style={styles.button}
-          onPress={() => this.navigation.navigate("Map", { line: 2 })}
-        >
-          Metro 2
-        </Text>
-        <Text
-          style={styles.button}
-          onPress={() => this.navigation.navigate("Map", { line: 3 })}
-        >
-          Metro 3
-        </Text>
-        <Text
-          style={styles.button}
-          onPress={() => this.navigation.navigate("Map", { line: 4 })}
-        >
-          Metro 4
-        </Text>
-        <Text
-          style={styles.button}
-          onPress={() => this.navigation.navigate("Map", { line: 5 })}
-        >
-          Metro 5
-        </Text>
-        <Text
-          style={styles.button}
-          onPress={() => this.navigation.navigate("Map", { line: 6 })}
-        >
-          Metro 6
-        </Text>
+        <TouchableOpacity style={styles.appButtonContainer}>
+          <Text
+            style={styles.button}
+            onPress={() => this.navigation.navigate("Map", { line: 1 })}
+          >
+            Metro 1
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.appButtonContainer}>
+          <Text
+            style={styles.button}
+            onPress={() => this.navigation.navigate("Map", { line: 2 })}
+          >
+            Metro 2
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.appButtonContainer}>
+          <Text
+            style={styles.button}
+            onPress={() => this.navigation.navigate("Map", { line: 3 })}
+          >
+            Metro 3
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.appButtonContainer}>
+          <Text
+            style={styles.button}
+            onPress={() => this.navigation.navigate("Map", { line: 4 })}
+          >
+            Metro 4
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.appButtonContainer}>
+          <Text
+            style={styles.button}
+            onPress={() => this.navigation.navigate("Map", { line: 5 })}
+          >
+            Metro 5
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.appButtonContainer}>
+          <Text
+            style={styles.button}
+            onPress={() => this.navigation.navigate("Map", { line: 6 })}
+          >
+            Metro 6
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
 }
 const styles = StyleSheet.create({
+  appButtonContainer: {
+    elevation: 8,
+    backgroundColor: "#009688",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+  },
   button: {
-    borderWidth: 2,
-    borderColor: "green",
-    width: 240,
-    height: 45,
-    textAlign: "center",
-    marginTop: 5,
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+    alignSelf: "center",
+    textTransform: "uppercase",
   },
 });
 
