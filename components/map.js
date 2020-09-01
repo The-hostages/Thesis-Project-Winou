@@ -200,41 +200,26 @@ export default class Map extends React.Component {
       this.mergeCoords
     );
   };
-  renderMarkers = () => {
-    const { locations } = this.state;
-    return (
-      <View>
-        {locations.map((location, idx) => {
-          const {
-            coords: { latitude, longitude },
-          } = location;
-          return (
-            <Marker
-              key={idx}
-              coordinate={{ latitude, longitude }}
-              image={require("../assets/station2.png")}
-              onPress={this.onMarkerPress(location)}
-            />
-          );
-        })}
-      </View>
-    );
-  };
-  // async trainItenerary() {
-  //   const { trainligne } = this.state;
-  //   const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
-  //   // const points = await Polyline.decode(trainligne.ligneOne[1]);
-  //   const coordsTrain = add
-  //     .map((added) =>
-  //       added.map((point) => ({
-  //         latitude: point[0],
-  //         longitude: point[1],
-  //       }))
-  //     )
-  //     .flat();
-  //   // console.log("coooooooo", coordsTrain);
-  //   this.setState({ coordsTrain });
-  // }
+  // renderMarkers = () => {
+  //   const { locations } = this.state;
+  //   return (
+  //     <View>
+  //       {locations.map((location, idx) => {
+  //         const {
+  //           coords: { latitude, longitude },
+  //         } = location;
+  //         return (
+  //           <Marker
+  //             key={idx}
+  //             coordinate={{ latitude, longitude }}
+  //             onPress={this.onMarkerPress(location)}
+  //           />
+  //         );
+  //       })}
+  //     </View>
+  //   );
+  // };
+
   render() {
     let {
       positionState,
