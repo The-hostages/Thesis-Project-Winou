@@ -21,32 +21,31 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 var API_KEY = "AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE";
 export default class Map extends React.Component {
-  state = {
-    // line: -1,
-    positionState: {
-      latitude: 0,
-      longitude: 0,
-      latitudeDelta: 0,
-      longitudeDelta: 0,
-    },
-    markerPosition: {
-      latitude: 0,
-      longitude: 0,
-    },
-    loading: true,
-    loadingMap: false,
-    locations: locations,
-    trainligne: trainligne,
-    longitudeStation: 0,
-    latitudeStation: 0,
-    allCoordsTrain: [],
-    oneLigne: 1,
-    oneCoords: [],
-  };
-  changeLine(x) {
-    this.setState = { line: x };
+  constructor(props) {
+    super(props);
+    this.state = {
+      line: this?.props?.route?.params?.line || -1,
+      positionState: {
+        latitude: 0,
+        longitude: 0,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+      },
+      markerPosition: {
+        latitude: 0,
+        longitude: 0,
+      },
+      loading: true,
+      loadingMap: false,
+      locations: locations,
+      trainligne: trainligne,
+      longitudeStation: 0,
+      latitudeStation: 0,
+      allCoordsTrain: [],
+      oneLigne: this?.props?.route?.params?.line || -1,
+      oneCoords: [],
+    };
   }
-
   async getLocationAsync() {
     try {
       const { status } = await Permissions.getAsync(Permissions.LOCATION);
@@ -132,16 +131,7 @@ export default class Map extends React.Component {
         )
         .slice(25)
         .join("%7C");
-      // const stationstring = specificLocation.map((location) => [
-      //   location.coords.latitude,
-      //   location.coords.longitude,
-      // ]);
-      // const test = geolib
-      //   .orderByDistance(
-      //     { latitude: current.lat, longitude: current.long },
-      //     stationstring
-      //   )
-      //   .slice(25);
+
       const response1 = await axios.get(
         `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&mode=walking&origins=${current.lat},${current.long}&destinations=${stationstring1}&key=${key}`
       );
@@ -234,7 +224,7 @@ export default class Map extends React.Component {
       this.state.loading = false;
     }
     if (oneLigne !== -1) {
-      this.state.oneCoords = [allCoordsTrain[oneLigne]];
+      this.state.oneCoords = [allCoordsTrain[oneLigne - 1]];
     }
   }
 

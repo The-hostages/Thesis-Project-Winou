@@ -21,7 +21,11 @@ class Login extends React.Component {
         email: this.state.email,
         password: this.state.password,
       })
-      .then(() => this.props.route.params.navigation.navigate("Map"))
+      .then(() =>
+        this.props.route.params.navigation.navigate("MyTabs", {
+          navigation: this.props.route.params.navigation,
+        })
+      )
       .catch((err) => {
         console.log("error");
         this.setState({ error: err });
