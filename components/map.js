@@ -6,7 +6,6 @@ import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Polyline from "@mapbox/polyline";
 import key from "../key";
-// import { NavigationContainer } from "@react-navigation/native";
 
 const locations = require("../locations.json");
 const trainligne = require("../encodedPoly.json");
@@ -41,12 +40,10 @@ export default class Map extends React.Component {
       longitudeStation: 0,
       latitudeStation: 0,
       allCoordsTrain: [],
+      oneLigne: this?.props?.route?.params?.line || -1,
+      oneCoords: [],
     };
     console.log(this.state.line);
-  }
-
-  changeLine(x) {
-    this.setState = { line: x };
   }
 
   async getLocationAsync() {
@@ -124,16 +121,7 @@ export default class Map extends React.Component {
         )
         .slice(25)
         .join("%7C");
-      // const stationstring = specificLocation.map((location) => [
-      //   location.coords.latitude,
-      //   location.coords.longitude,
-      // ]);
-      // const test = geolib
-      //   .orderByDistance(
-      //     { latitude: current.lat, longitude: current.long },
-      //     stationstring
-      //   )
-      //   .slice(25);
+
       const response1 = await axios.get(
         `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&mode=walking&origins=${current.lat},${current.long}&destinations=${stationstring1}&key=${key}`
       );
@@ -168,7 +156,6 @@ export default class Map extends React.Component {
   async AlltrainItenerary() {
     try {
       const { trainligne } = this.state;
-
       const add = await Object.values(trainligne).map((ligne) =>
         ligne.map((ougabouga) => Polyline.decode(ougabouga))
       );
@@ -180,7 +167,6 @@ export default class Map extends React.Component {
             longitude: pis[1],
           }))
         );
-
       this.setState({ allCoordsTrain });
     } catch (e) {
       console.error("error", e);
@@ -207,7 +193,7 @@ export default class Map extends React.Component {
       this.state.loading = false;
     }
     if (oneLigne !== -1) {
-      this.state.oneCoords = [allCoordsTrain[oneLigne]];
+      this.state.oneCoords = [allCoordsTrain[oneLigne - 1]];
     }
   }
 
