@@ -5,24 +5,24 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Map from "./map";
 import Line from "./Lines";
 
-function Profile() {
+function Profile(props) {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Map />
     </View>
   );
 }
-function Feed() {
+function Feed(props) {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Line />
+      <Line navigation={props.navigation} />
     </View>
   );
 }
 
 const Tab = createMaterialBottomTabNavigator();
 
-function MyTabs() {
+function MyTabs(props) {
   return (
     <Tab.Navigator
       initialRouteName="Profile"
