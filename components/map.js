@@ -5,7 +5,6 @@ import axios from "axios";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Polyline from "@mapbox/polyline";
-import { NavigationContainer } from "@react-navigation/native";
 
 const locations = require("../locations.json");
 const trainligne = require("../encodedPoly.json");
@@ -18,26 +17,31 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 var API_KEY = "AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE";
 export default class Map extends React.Component {
-  state = {
-    line: -1,
-    positionState: {
-      latitude: 0,
-      longitude: 0,
-      latitudeDelta: 0,
-      longitudeDelta: 0,
-    },
-    markerPosition: {
-      latitude: 0,
-      longitude: 0,
-    },
-    loading: true,
-    loadingMap: false,
-    locations: locations,
-    trainligne: trainligne,
-    longitudeStation: 0,
-    latitudeStation: 0,
-    allCoordsTrain: [],
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      line: this?.props?.route?.params?.line || -1,
+      positionState: {
+        latitude: 0,
+        longitude: 0,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+      },
+      markerPosition: {
+        latitude: 0,
+        longitude: 0,
+      },
+      loading: true,
+      loadingMap: false,
+      locations: locations,
+      trainligne: trainligne,
+      longitudeStation: 0,
+      latitudeStation: 0,
+      allCoordsTrain: [],
+    };
+    console.log(this.state.line);
+  }
+
   changeLine(x) {
     this.setState = { line: x };
   }
@@ -128,7 +132,7 @@ export default class Map extends React.Component {
   async AlltrainItenerary() {
     try {
       const { trainligne } = this.state;
-      console.log(trainligne);
+
       const add = await Object.values(trainligne).map((ligne) =>
         ligne.map((ougabouga) => Polyline.decode(ougabouga))
       );
@@ -147,7 +151,7 @@ export default class Map extends React.Component {
             longitude: pis[1],
           }))
         );
-      // console.log(JSON.stringify(allCoordsTrain));
+      // (JSON.stringify(allCoordsTrain));
       this.setState({ allCoordsTrain });
       // return (
       //   <View>
