@@ -76,12 +76,6 @@ export default class Map extends React.Component {
     }
   }
   async trainLocationMovement() {
-    const firebaseData = await db
-      .ref("/locations")
-      .once("value")
-      .then((x) => console.log(x[0]));
-  }
-  async componentDidMount() {
     await db.ref("/locations").on("value", (x) => {
       const valueofFire = x.val();
       this.setState({
@@ -93,28 +87,29 @@ export default class Map extends React.Component {
         ].loc.coords.longitude,
       });
     });
-
+  }
+  async componentDidMount() {
+    await this.trainLocationMovement();
     await this.AlltrainItenerary();
     await this.getLocationAsync();
   }
 
   async getDirections(startLoc, desLoc) {
     try {
-      const resp = await axios.get(
+      const axiosResponse = await axios.get(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${key}&mode=walking`
       );
-
-      const response = await resp.data.routes[0];
-      const distanceTime = response.legs[0];
-      const distance = distanceTime.distance.text;
-      const time = distanceTime.duration.text;
-      const points = Polyline.decode(response.overview_polyline.points);
-      const coords = points.map((point) => {
-        return {
+      const response = axiosResponse.data.routes[0];
+      const {
+        distance: { text: distance },
+        duration: { text: time },
+      } = response.legs[0];
+      const coords = Polyline.decode(response.overview_polyline.points).map(
+        (point) => ({
           latitude: point[0],
           longitude: point[1],
-        };
-      });
+        })
+      );
       this.setState({ coords, distance, time });
     } catch (e) {
       console.error("error", e);
