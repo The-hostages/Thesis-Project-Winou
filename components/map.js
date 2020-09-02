@@ -1,13 +1,17 @@
-import React from "react";
+import * as React from "react";
 import MapView, { Marker } from "react-native-maps";
-import { StyleSheet, View, Dimensions } from "react-native";
+import { StyleSheet, View, Text, Dimensions } from "react-native";
 import axios from "axios";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Polyline from "@mapbox/polyline";
+import key from "../key";
+import { db } from "../config";
+// import { NavigationContainer } from "@react-navigation/native";
 
 const locations = require("../locations.json");
 const trainligne = require("../encodedPoly.json");
+const geolib = require("geolib");
 
 const { width, height } = Dimensions.get("window");
 const SCREEN_HEIGHT = height;
@@ -15,28 +19,33 @@ const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
+var API_KEY = "AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE";
 export default class Map extends React.Component {
-  state = {
-    positionState: {
-      latitude: 0,
-      longitude: 0,
-      latitudeDelta: 0,
-      longitudeDelta: 0,
-    },
-    markerPosition: {
-      latitude: 0,
-      longitude: 0,
-    },
-    loading: true,
-    loadingMap: false,
-    locations: locations,
-    trainligne: trainligne,
-    longitudeStation: 0,
-    latitudeStation: 0,
-    allCoordsTrain: [],
-  };
-
+  constructor(props) {
+    super(props);
+    this.state = {
+      line: this?.props?.route?.params?.line || -1,
+      positionState: {
+        latitude: 0,
+        longitude: 0,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+      },
+      markerPosition: {
+        latitude: 0,
+        longitude: 0,
+      },
+      loading: true,
+      loadingMap: false,
+      locations: locations,
+      trainligne: trainligne,
+      longitudeStation: 0,
+      latitudeStation: 0,
+      allCoordsTrain: [],
+      oneLigne: this?.props?.route?.params?.line || -1,
+      oneCoords: [],
+    };
+  }
   async getLocationAsync() {
     try {
       const { status } = await Permissions.getAsync(Permissions.LOCATION);
@@ -63,22 +72,35 @@ export default class Map extends React.Component {
         },
         this.mergeCoords
       );
-    } catch (e) {}
+    } catch (e) {
+      console.error("error", e);
+    }
+  }
+  async trainLocationMovement() {
+    await db
+      .ref("/locations")
+      .once("value")
+      .then((x) => console.log(x[0]));
   }
   async componentDidMount() {
+    // await db
+    //   .ref("/locations")
+    //   .once("value")
+    //   .then((x) => console.log(x));
     await this.AlltrainItenerary();
     await this.getLocationAsync();
   }
+
   async getDirections(startLoc, desLoc) {
     try {
       const resp = await axios.get(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE&mode=walking`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${startLoc}&destination=${desLoc}&key=${key}&mode=walking`
       );
-      const response = await resp.data.routes[0];
-      // const distanceTime =  response.legs[0]
-      // const distance =  distanceTime.distance.text
-      // const time = distanceTime.duration.text
 
+      const response = await resp.data.routes[0];
+      const distanceTime = response.legs[0];
+      const distance = distanceTime.distance.text;
+      const time = distanceTime.duration.text;
       const points = Polyline.decode(response.overview_polyline.points);
       const coords = points.map((point) => {
         return {
@@ -86,36 +108,80 @@ export default class Map extends React.Component {
           longitude: point[1],
         };
       });
-      this.setState({ coords });
-    } catch (error) {}
+      this.setState({ coords, distance, time });
+    } catch (e) {
+      console.error("error", e);
+    }
   }
   _getNearestStation = async (lat, long) => {
     try {
-      const { locations } = this.state;
+      const { locations, oneLigne } = this.state;
       const current = { lat, long };
-      const locat = locations
-        .map((loca) =>
-          [loca.coords.latitude, loca.coords.longitude].join("%2C")
+      const specificLocation =
+        oneLigne !== -1 ? locations[oneLigne] : locations.flat();
+      const stationstring1 = specificLocation
+        .map((location) =>
+          [location.coords.latitude, location.coords.longitude].join("%2C")
         )
+        .slice(0, 25)
         .join("%7C");
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&mode=walking&origins=${current.lat},${current.long}&destinations=${locat}&key=AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE`
-      );
-      const res = response.data.rows[0].elements
-        .map((ele, i) => {
-          return {
-            ...ele,
-            destination_addresses: response.data.destination_addresses[i],
-            coords: locations[i].coords,
-          };
-        })
-        .sort((a, b) => a.duration.value - b.duration.value)[0];
+      const stationstring2 = specificLocation
+        .map((location) =>
+          [location.coords.latitude, location.coords.longitude].join("%2C")
+        )
+        .slice(25)
+        .join("%7C");
 
-      this.setState({
-        latitudeStation: res.coords.latitude,
-        longitudeStation: res.coords.longitude,
+      const response1 = await axios.get(
+        `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&mode=walking&origins=${current.lat},${current.long}&destinations=${stationstring1}&key=${key}`
+      );
+      if (!!stationstring2.length) {
+        var response2 = await axios.get(
+          `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&mode=walking&origins=${current.lat},${current.long}&destinations=${stationstring2}&key=${key}`
+        );
+      } else {
+        var response2 = {};
+      }
+      const response = { ...response1, ...response2 };
+      const res = response.data.rows[0].elements.map((ele, i) => {
+        return {
+          ...ele,
+          destination_addresses: response.data.destination_addresses[i],
+          coords: specificLocation[i].coords,
+        };
       });
-    } catch (e) {}
+      const sort = function (prop, arr) {
+        prop = prop.split(".");
+        var len = prop.length;
+        arr.sort(function (a, b) {
+          var i = 0;
+          while (i < len) {
+            a = a[prop[i]];
+            b = b[prop[i]];
+            i++;
+          }
+          if (a < b) {
+            return -1;
+          } else if (a > b) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+        return arr;
+      };
+      const sortedRes = sort("distance.value", res)[0];
+      console.log("respppppppppppp", sortedRes);
+      // .sort((a, b) => {
+      //   a.distance.value - b.distance.value;
+      // })[0];
+      this.setState({
+        latitudeStation: sortedRes.coords.latitude,
+        longitudeStation: sortedRes.coords.longitude,
+      });
+    } catch (e) {
+      console.error("error", e);
+    }
   };
 
   async AlltrainItenerary() {
@@ -124,13 +190,6 @@ export default class Map extends React.Component {
       const add = await Object.values(trainligne).map((ligne) =>
         ligne.map((ougabouga) => Polyline.decode(ougabouga))
       );
-      // const points = await Polyline.decode(trainligne.ligneOne[1]);
-      // const allCoordsTrain = add.map((ligne) =>
-      //   ligne.flat().map((point) => ({
-      //     latitude: point[0],
-      //     longitude: point[1],
-      //   }))
-      // );
       const allCoordsTrain = add
         .map((poly) => poly.flat())
         .map((point) =>
@@ -139,20 +198,7 @@ export default class Map extends React.Component {
             longitude: pis[1],
           }))
         );
-      // console.log(JSON.stringify(allCoordsTrain));
       this.setState({ allCoordsTrain });
-      // return (
-      //   <View>
-      //     {allCoordsTrain.map((ligne, idx) => (
-      //       <MapView.Polyline
-      //         key={idx}
-      //         strokeWidth={4}
-      //         strokeColor="rgba(22,140,0,0.7)"
-      //         coordinates={ligne}
-      //       />
-      //     ))}
-      //   </View>
-      // );
     } catch (e) {
       console.error("error", e);
     }
@@ -160,7 +206,6 @@ export default class Map extends React.Component {
 
   mergeCoords = async () => {
     const { positionState, latitudeStation, longitudeStation } = this.state;
-
     const hasStartAndEnd =
       positionState.latitude !== null && latitudeStation !== null;
 
@@ -173,12 +218,16 @@ export default class Map extends React.Component {
   //till here
 
   componentDidUpdate() {
-    const { positionState } = this.state;
+    const { positionState, oneLigne, allCoordsTrain } = this.state;
     if (positionState.latitude !== 0) {
       this.state.loadingMap = true;
       this.state.loading = false;
     }
+    if (oneLigne !== -1) {
+      this.state.oneCoords = [allCoordsTrain[oneLigne - 1]];
+    }
   }
+
   onMarkerPress = (location) => async () => {
     const {
       coords: { latitude, longitude },
@@ -212,31 +261,21 @@ export default class Map extends React.Component {
       </View>
     );
   };
-  // async trainItenerary() {
-  //   const { trainligne } = this.state;
-  //   const add = await trainligne.ligneOne.map((poly) => Polyline.decode(poly));
-  //   // const points = await Polyline.decode(trainligne.ligneOne[1]);
-  //   const coordsTrain = add
-  //     .map((added) =>
-  //       added.map((point) => ({
-  //         latitude: point[0],
-  //         longitude: point[1],
-  //       }))
-  //     )
-  //     .flat();
-  //   // console.log("coooooooo", coordsTrain);
-  //   this.setState({ coordsTrain });
-  // }
+
   render() {
     let {
       positionState,
       coords,
       loadingMap,
-      coordsTrain,
       longitudeStation,
       latitudeStation,
       allCoordsTrain,
+      oneLigne,
+      oneCoords,
+      time,
+      distance,
     } = this.state;
+    const data = oneLigne != -1 ? oneCoords : allCoordsTrain;
     return (
       <View style={Styles.container}>
         {loadingMap && (
@@ -252,7 +291,7 @@ export default class Map extends React.Component {
               strokeColor="rgba(255,140,0,0.8)"
               coordinates={coords}
             />
-            {allCoordsTrain.map((ligne, idx) => (
+            {data.map((ligne, idx) => (
               <MapView.Polyline
                 key={idx}
                 strokeWidth={4}
@@ -276,6 +315,26 @@ export default class Map extends React.Component {
             />
           </MapView>
         )}
+        <View
+          style={{
+            width,
+            paddingTop: 10,
+            paddingBottom: 10,
+            alignSelf: "center",
+            alignItems: "center",
+            height: height * 0.05,
+            backgroundColor: "white",
+            justifyContent: "flex-end",
+            position: "absolute",
+            top: 0,
+          }}
+        >
+          <Text style={{ fontWeight: "bold" }}>
+            {" "}
+            {time} ({distance})
+          </Text>
+        </View>
+        {/* <MyTabs /> */}
       </View>
     );
   }

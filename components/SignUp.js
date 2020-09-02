@@ -17,7 +17,6 @@ class SignUp extends React.Component {
   }
 
   signUp(e) {
-    console.log("here");
     e.preventDefault();
     const user = {
       first_name: this.state.first_name,
@@ -63,6 +62,7 @@ class SignUp extends React.Component {
           }}
         ></TextInput>
         <TextInput
+          secureTextEntry={true}
           placeholder="password"
           style={styles.input}
           onChangeText={(password) => {
