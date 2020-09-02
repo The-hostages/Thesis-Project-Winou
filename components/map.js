@@ -11,7 +11,6 @@ import { db } from "../config";
 
 const locations = require("../locations.json");
 const trainligne = require("../encodedPoly.json");
-const geolib = require("geolib");
 
 const { width, height } = Dimensions.get("window");
 const SCREEN_HEIGHT = height;
@@ -19,7 +18,7 @@ const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-var API_KEY = "AIzaSyAXcO-TwBc8G8_ktmHpTZZx4KdBeWnKdmE";
+
 export default class Map extends React.Component {
   constructor(props) {
     super(props);
@@ -77,16 +76,24 @@ export default class Map extends React.Component {
     }
   }
   async trainLocationMovement() {
-    await db
+    const firebaseData = await db
       .ref("/locations")
       .once("value")
       .then((x) => console.log(x[0]));
   }
   async componentDidMount() {
-    // await db
-    //   .ref("/locations")
-    //   .once("value")
-    //   .then((x) => console.log(x));
+    await db.ref("/locations").on("value", (x) => {
+      const valueofFire = x.val();
+      this.setState({
+        metroLatitude: Object.values(valueofFire)[
+          Object.values(valueofFire).length - 3
+        ].loc.coords.latitude,
+        metroLongitude: Object.values(valueofFire)[
+          Object.values(valueofFire).length - 3
+        ].loc.coords.longitude,
+      });
+    });
+
     await this.AlltrainItenerary();
     await this.getLocationAsync();
   }
@@ -171,7 +178,6 @@ export default class Map extends React.Component {
         return arr;
       };
       const sortedRes = sort("distance.value", res)[0];
-      console.log("respppppppppppp", sortedRes);
       // .sort((a, b) => {
       //   a.distance.value - b.distance.value;
       // })[0];
@@ -274,6 +280,8 @@ export default class Map extends React.Component {
       oneCoords,
       time,
       distance,
+      metroLatitude,
+      metroLongitude,
     } = this.state;
     const data = oneLigne != -1 ? oneCoords : allCoordsTrain;
     return (
@@ -310,6 +318,13 @@ export default class Map extends React.Component {
               coordinate={{
                 latitude: latitudeStation,
                 longitude: longitudeStation,
+              }}
+              image={require("../assets/station3.png")}
+            />
+            <Marker
+              coordinate={{
+                latitude: metroLatitude,
+                longitude: metroLongitude,
               }}
               image={require("../assets/station3.png")}
             />
