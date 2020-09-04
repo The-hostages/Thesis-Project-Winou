@@ -1,6 +1,13 @@
 import * as React from "react";
 import MapView, { Marker } from "react-native-maps";
-import { StyleSheet, View, Text, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  Button,
+} from "react-native";
 import axios from "axios";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
@@ -8,7 +15,7 @@ import Polyline from "@mapbox/polyline";
 import key from "../key";
 import { db } from "../config";
 // import { NavigationContainer } from "@react-navigation/native";
-
+import Communications from "react-native-communications";
 const locations = require("../locations.json");
 const trainligne = require("../encodedPoly.json");
 
@@ -268,6 +275,16 @@ export default class Map extends React.Component {
     );
   };
 
+  async sendingSms() {
+    console.log("executed");
+    const { positionState } = this.state;
+
+    await Communications.text(
+      "0021692007369",
+      `Emergency http://maps.google.com/?q=${positionState.latitude},${positionState.longitude}`
+    );
+  }
+
   render() {
     let {
       positionState,
@@ -350,6 +367,24 @@ export default class Map extends React.Component {
           </Text>
         </View>
         {/* <MyTabs /> */}
+        {/* <View style={Styles.SOSbutton}>
+          <Button
+            title="ALERT"
+            onPress={() => {
+              this.sendingSms();
+            }}
+          />
+        </View> */}
+        <TouchableOpacity style={Styles.ButtonContainer}>
+          <Text
+            style={Styles.SOSbutton}
+            onPress={() => {
+              this.sendingSms();
+            }}
+          >
+            ALERT
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -387,11 +422,6 @@ const Styles = StyleSheet.create({
   map: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    // left: 0,
-    // right: 0,
-    // top: 0,
-    // bottom: 0,
-    // position: "absolute",
   },
   loading: {
     position: "absolute",
@@ -401,5 +431,32 @@ const Styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  // SOSbutton: {
+  //   backgroundColor: "#F5FCFF",
+  //   textAlign: "center",
+  //   fontSize: 25,
+  //   marginTop: 16,
+  //   position: "absolute",
+  //   top: 0,
+  //   borderRadius: 20,
+  // },
+  ButtonContainer: {
+    elevation: 8,
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+    position: "absolute",
+    top: 50,
+    left: 0,
+  },
+  SOSbutton: {
+    fontSize: 18,
+    color: "#FF0000",
+    fontWeight: "bold",
+    alignSelf: "center",
+    textTransform: "uppercase",
   },
 });
