@@ -12,6 +12,7 @@ import Line from "./components/Lines";
 
 YellowBox.ignoreWarnings([
   "Non-serializable values were found in the navigation state",
+  "Setting a timer for a long period of time",
 ]);
 const Stack = createStackNavigator();
 const StackNavigator = () => {
@@ -43,14 +44,8 @@ const StackNavigator = () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-        }}
-      >
-        <StackNavigator />
-      </SafeAreaView>
+      <StatusBar hidden />
+      <StackNavigator />
     </NavigationContainer>
   );
 }

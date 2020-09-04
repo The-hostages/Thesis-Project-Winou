@@ -25,10 +25,14 @@ const Tab = createMaterialBottomTabNavigator();
 function MyTabs(props) {
   return (
     <Tab.Navigator
+      shifting={true}
+      labeled={true}
+      sceneAnimationEnabled={true}
+      activeColor="#00aea2"
+      inactiveColor="#95a5a6"
+      barStyle={{ backgroundColor: "#ffff" }}
       initialRouteName="Profile"
-      activeColor="green"
       labelStyle={{ fontSize: 12 }}
-      style={{ backgroundColor: "tomato" }}
     >
       <Tab.Screen
         name="Profile"
