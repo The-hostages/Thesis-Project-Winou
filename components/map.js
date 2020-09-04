@@ -6,7 +6,6 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
-  Button,
 } from "react-native";
 import axios from "axios";
 import * as Location from "expo-location";
@@ -89,6 +88,31 @@ export default class Map extends React.Component {
           positionState: region,
         },
         this.mergeCoords
+      );
+      await Location.watchPositionAsync(
+        {
+          enableHighAccuracy: true,
+          timeInterval: 1000,
+          distanceInterval: 2,
+        },
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const { routeCoordinates, distanceTravelled } = this.state;
+          const newCoordinate = { latitude, longitude };
+          console.log("ok", newCoordinate);
+          this.setState({
+            latitude,
+            longitude,
+            distanceTravelled:
+              distanceTravelled + this.calcDistance(newCoordinate),
+            routeCoordinates: routeCoordinates.concat([newCoordinate]),
+            prevLatLng: newCoordinate,
+          });
+          console.log("dist", this.state);
+          setTimeout(() => {
+            console.log("time out", this.state);
+          }, 2000);
+        }
       );
     } catch (e) {
       console.error("error", e);
@@ -455,14 +479,6 @@ export default class Map extends React.Component {
           </Text>
         </View>
         {/* <MyTabs /> */}
-        {/* <View style={Styles.SOSbutton}>
-          <Button
-            title="ALERT"
-            onPress={() => {
-              this.sendingSms();
-            }}
-          />
-        </View> */}
         <TouchableOpacity style={Styles.ButtonContainer}>
           <Text
             style={Styles.SOSbutton}
