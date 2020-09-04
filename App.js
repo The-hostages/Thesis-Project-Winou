@@ -1,15 +1,18 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { SafeAreaView, StatusBar, Text } from "react-native";
+import { SafeAreaView, StatusBar, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import Map from "./components/map";
 import Homepage from "./components/Homepage";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import { YellowBox } from "react-native";
+import MyTabs from "./components/NavComponent";
+import Line from "./components/Lines";
 
 YellowBox.ignoreWarnings([
   "Non-serializable values were found in the navigation state",
+  "Setting a timer for a long period of time",
 ]);
 const Stack = createStackNavigator();
 const StackNavigator = () => {
@@ -27,7 +30,7 @@ const StackNavigator = () => {
       />
       <Stack.Screen
         name="Login"
-        component={Map}
+        component={MyTabs}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -41,14 +44,8 @@ const StackNavigator = () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-        }}
-      >
-        <StackNavigator />
-      </SafeAreaView>
+      <StatusBar hidden />
+      <StackNavigator />
     </NavigationContainer>
   );
 }

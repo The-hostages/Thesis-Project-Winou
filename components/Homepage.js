@@ -12,7 +12,7 @@ function Homepage({ navigation }) {
   return (
     <ImageBackground
       style={styles.imageback}
-      source={require("../assets/1.jpg")}
+      source={require("../assets/b22ba4b7ebd594de3f383ae9f06f1998.jpg")}
     >
       <View style={styles.buttonContainer}>
         <View style={styles.loginButton}>
