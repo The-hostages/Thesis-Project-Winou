@@ -91,31 +91,31 @@ export default class Map extends React.Component {
         },
         this.mergeCoords
       );
-      await Location.watchPositionAsync(
-        {
-          enableHighAccuracy: true,
-          timeInterval: 1000,
-          distanceInterval: 2,
-        },
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const { routeCoordinates, distanceTravelled } = this.state;
-          const newCoordinate = { latitude, longitude };
-          console.log("ok", newCoordinate);
-          this.setState({
-            latitude,
-            longitude,
-            distanceTravelled:
-              distanceTravelled + this.calcDistance(newCoordinate),
-            routeCoordinates: routeCoordinates.concat([newCoordinate]),
-            prevLatLng: newCoordinate,
-          });
-          console.log("dist", this.state);
-          setTimeout(() => {
-            console.log("time out", this.state);
-          }, 2000);
-        }
-      );
+      // await Location.watchPositionAsync(
+      //   {
+      //     enableHighAccuracy: true,
+      //     timeInterval: 1000,
+      //     distanceInterval: 2,
+      //   },
+      //   (position) => {
+      //     const { latitude, longitude } = position.coords;
+      //     const { routeCoordinates, distanceTravelled } = this.state;
+      //     const newCoordinate = { latitude, longitude };
+      //     console.log("ok", newCoordinate);
+      //     this.setState({
+      //       latitude,
+      //       longitude,
+      //       distanceTravelled:
+      //         distanceTravelled + this.calcDistance(newCoordinate),
+      //       routeCoordinates: routeCoordinates.concat([newCoordinate]),
+      //       prevLatLng: newCoordinate,
+      //     });
+      //     console.log("dist", this.state);
+      //     setTimeout(() => {
+      //       console.log("time out", this.state);
+      //     }, 2000);
+      //   }
+      // );
     } catch (e) {
       console.error("error", e);
     }
@@ -537,7 +537,7 @@ export default class Map extends React.Component {
             </View>
           </View>
         )}
-        <View
+        {/* <View
           style={{
             width,
             paddingTop: 10,
@@ -555,7 +555,7 @@ export default class Map extends React.Component {
             {" "}
             {time} ({distance})
           </Text>
-        </View>
+        </View> */}
         {/* <MyTabs /> */}
         <TouchableOpacity style={Styles.ButtonContainer}>
           <Text
@@ -652,7 +652,7 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 10,
     position: "absolute",
-    top: 50,
+    top: 100,
     left: 0,
   },
   SOSbutton: {
