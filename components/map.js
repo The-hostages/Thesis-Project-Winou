@@ -14,6 +14,8 @@ import * as Permissions from "expo-permissions";
 import Polyline from "@mapbox/polyline";
 import key from "../key";
 import { db } from "../config";
+// import { NavigationContainer } from "@react-navigation/native";
+import Communications from "react-native-communications";
 import * as TaskManager from "expo-task-manager";
 import mapStyle from "./mapstyle.json";
 import { getDistance, findNearest, getCenter } from "geolib";
@@ -88,6 +90,31 @@ export default class Map extends React.Component {
           positionState: region,
         },
         this.mergeCoords
+      );
+      await Location.watchPositionAsync(
+        {
+          enableHighAccuracy: true,
+          timeInterval: 1000,
+          distanceInterval: 2,
+        },
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const { routeCoordinates, distanceTravelled } = this.state;
+          const newCoordinate = { latitude, longitude };
+          console.log("ok", newCoordinate);
+          this.setState({
+            latitude,
+            longitude,
+            distanceTravelled:
+              distanceTravelled + this.calcDistance(newCoordinate),
+            routeCoordinates: routeCoordinates.concat([newCoordinate]),
+            prevLatLng: newCoordinate,
+          });
+          console.log("dist", this.state);
+          setTimeout(() => {
+            console.log("time out", this.state);
+          }, 2000);
+        }
       );
     } catch (e) {
       console.error("error", e);
@@ -320,6 +347,16 @@ export default class Map extends React.Component {
       }
     );
   };
+  async sendingSms() {
+    console.log("executed");
+    const { positionState } = this.state;
+
+    await Communications.text(
+      "0021692007369",
+      `Emergency http://maps.google.com/?q=${positionState.latitude},${positionState.longitude}`
+    );
+  }
+
   trainPosition = () => {};
   render() {
     let {
@@ -500,6 +537,36 @@ export default class Map extends React.Component {
             </View>
           </View>
         )}
+        <View
+          style={{
+            width,
+            paddingTop: 10,
+            paddingBottom: 10,
+            alignSelf: "center",
+            alignItems: "center",
+            height: height * 0.05,
+            backgroundColor: "white",
+            justifyContent: "flex-end",
+            position: "absolute",
+            top: 0,
+          }}
+        >
+          <Text style={{ fontWeight: "bold" }}>
+            {" "}
+            {time} ({distance})
+          </Text>
+        </View>
+        {/* <MyTabs /> */}
+        <TouchableOpacity style={Styles.ButtonContainer}>
+          <Text
+            style={Styles.SOSbutton}
+            onPress={() => {
+              this.sendingSms();
+            }}
+          >
+            ALERT
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -566,11 +633,6 @@ const Styles = StyleSheet.create({
   map: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    // left: 0,
-    // right: 0,
-    // top: 0,
-    // bottom: 0,
-    // position: "absolute",
   },
   loading: {
     position: "absolute",
@@ -580,5 +642,24 @@ const Styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  ButtonContainer: {
+    elevation: 8,
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+    position: "absolute",
+    top: 50,
+    left: 0,
+  },
+  SOSbutton: {
+    fontSize: 18,
+    color: "#FF0000",
+    fontWeight: "bold",
+    alignSelf: "center",
+    textTransform: "uppercase",
   },
 });
