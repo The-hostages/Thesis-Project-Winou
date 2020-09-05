@@ -29,6 +29,11 @@ const StackNavigator = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="MyTabs"
+        component={MyTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="Login"
         component={MyTabs}
         options={{ headerShown: false }}
