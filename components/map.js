@@ -6,6 +6,7 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import axios from "axios";
 import * as Location from "expo-location";
@@ -15,6 +16,7 @@ import key from "../key";
 import { db } from "../config";
 import * as TaskManager from "expo-task-manager";
 import mapStyle from "./mapstyle.json";
+import { getDistance, findNearest, getCenter } from "geolib";
 
 const locations = require("../locations.json");
 const trainligne = require("../encodedPoly.json");
@@ -107,7 +109,17 @@ export default class Map extends React.Component {
   //     console.error("error", e);
   //   }
   // }
-
+  // showdistance() {
+  //   const { allCoordsTrain, metroLatitude, metroLongitude } = this.state;
+  //   console.log(allCoordsTrain[0]);
+  //   const findnearest = getCenter(
+  //     // { latitude: metroLatitude, longitude: metroLongitude },
+  //     allCoordsTrain[0]
+  //   );
+  //   this.setState({
+  //     distancePoints: findnearest,
+  //   });
+  // }
   async trainLocationMovement() {
     await db.ref("/locations").on("value", (x) => {
       const valueofFire = x.val();
@@ -125,6 +137,7 @@ export default class Map extends React.Component {
     await this.trainLocationMovement();
     await this.AlltrainItenerary();
     await this.getLocationAsync();
+    //await this.showdistance();
   }
 
   async getDirections(startLoc, desLoc) {
@@ -175,6 +188,9 @@ export default class Map extends React.Component {
 
       const response = await Promise.all(stations);
       const ress = response.map((res) => res.data);
+
+      //it goes only throw 25 fix this SHITTTTTTTTTTTTTTTTTT
+
       const res = ress[0].rows[0].elements.map((ele, i) => ({
         ...ele,
         destination_addresses: ress[0].destination_addresses[i],
@@ -274,39 +290,36 @@ export default class Map extends React.Component {
   // };
   /*** Getting the new Coordinate distance !!! function  */
 
-  // gettingNewCoordinates = async () => {
-  //   console.log("working");
-  //   await Location.requestPermissionsAsync();
-  //   await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-  //     enableHighAccuracy: true,
-  //     distanceInterval: 1,
-  //     timeInterval: 5000,
-  //   });
-  //   await Location.watchPositionAsync(
-  //     {
-  //       enableHighAccuracy: true,
-  //       timeInterval: 4000,
-  //       distanceInterval: 2,
-  //     },
-  //     (position) => {
-  //       console.log(position);
-  //       var { latitude, longitude } = position.coords;
-  //       var region = {
-  //         latitude,
-  //         longitude,
-  //         latitudeDelta: LATITUDE_DELTA,
-  //         longitudeDelta: LONGITUDE_DELTA,
-  //       };
-  //       console.log(position);
-  //       this.setState(
-  //         {
-  //           positionState: region,
-  //         },
-  //         this.mergeCoords
-  //       );
-  //     }
-  //   );
-  // };
+  gettingNewCoordinates = async () => {
+    await Location.requestPermissionsAsync();
+    await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+      enableHighAccuracy: true,
+      distanceInterval: 1,
+      timeInterval: 5000,
+    });
+    await Location.watchPositionAsync(
+      {
+        enableHighAccuracy: true,
+        timeInterval: 20000,
+        distanceInterval: 2,
+      },
+      (position) => {
+        var { latitude, longitude } = position.coords;
+        var region = {
+          latitude,
+          longitude,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA,
+        };
+        this.setState(
+          {
+            positionState: region,
+          },
+          this.mergeCoords
+        );
+      }
+    );
+  };
   trainPosition = () => {};
   render() {
     let {
@@ -325,10 +338,15 @@ export default class Map extends React.Component {
       distanceTrain,
       timeTrain,
       locations,
+      distancePoints,
     } = this.state;
+
     const data = oneLigne != -1 ? oneCoords : allCoordsTrain;
     const specificLocation =
       oneLigne !== -1 ? locations[oneLigne] : locations.flat();
+
+    // console.log(distancePoints);
+
     return (
       <View style={Styles.container}>
         {/* {loadingMap === false && (
@@ -369,7 +387,7 @@ export default class Map extends React.Component {
               {data.map((ligne, idx) => (
                 <MapView.Polyline
                   key={idx}
-                  strokeWidth={4}
+                  strokeWidth={5}
                   strokeColor="rgba(181,0,71,0.7)"
                   coordinates={ligne}
                 />
@@ -378,16 +396,45 @@ export default class Map extends React.Component {
 
                 .map((location) => {
                   return {
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
+                    coords: {
+                      latitude: location.coords.latitude,
+                      longitude: location.coords.longitude,
+                    },
+                    name: location.name,
                   };
                 })
                 .map((station, idx) => (
-                  <Marker
-                    key={idx}
-                    coordinate={station}
-                    image={require("../assets/stations1.png")}
-                  />
+                  <View key={`a${idx}`}>
+                    <Marker
+                      key={`b${idx}`}
+                      coordinate={station.coords}
+                      image={require("../assets/stations1.png")}
+                    ></Marker>
+                    <Marker
+                      key={`c${idx}`}
+                      style={{
+                        top: 0,
+                        right: 200,
+                        zIndex: 2,
+                        position: "relative",
+                        width: 100,
+                      }}
+                      coordinate={station.coords}
+                    >
+                      <View
+                        style={{
+                          width: 100,
+                          height: 10,
+                          zIndex: 2,
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                        }}
+                      >
+                        <Text style={{ fontSize: 12 }}>{station.name}</Text>
+                      </View>
+                    </Marker>
+                  </View>
                 ))}
 
               <Marker
@@ -400,24 +447,55 @@ export default class Map extends React.Component {
             </MapView>
             <View
               style={{
-                width,
+                backgroundColor: "#fff",
+                width: 150,
                 paddingTop: 10,
                 paddingBottom: 10,
                 alignSelf: "center",
                 alignItems: "center",
-                height: height * 0.05,
-
+                height: height * 0.15,
+                borderBottomRightRadius: 25,
                 justifyContent: "flex-end",
                 position: "absolute",
-                top: 60,
+                top: 0,
+                left: 0,
               }}
             >
-              <Text style={{ fontWeight: "bold" }}>
-                To station : {time} ({distance})
+              <Text>
+                <Image
+                  source={require("../assets/persontostation.png")}
+                  style={{ width: 80, height: 80 }}
+                />
               </Text>
-              <Text style={{ fontWeight: "bold" }}>
+              <Text style={{ fontWeight: "bold", color: "grey" }}>
+                {time} ({distance})
+              </Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: "#fff",
+                width: 150,
+                paddingTop: 10,
+                paddingBottom: 10,
+                alignSelf: "center",
+                alignItems: "center",
+                height: height * 0.15,
+                borderBottomLeftRadius: 25,
+                justifyContent: "flex-end",
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+            >
+              <Text>
+                <Image
+                  source={require("../assets/metrotoStation.png")}
+                  style={{ width: 80, height: 80 }}
+                />
+              </Text>
+              <Text style={{ fontWeight: "bold", color: "grey" }}>
                 {" "}
-                Train estimated time : {timeTrain} ({distanceTrain})
+                {timeTrain} ({distanceTrain})
               </Text>
             </View>
           </View>
